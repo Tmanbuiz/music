@@ -287,8 +287,9 @@ final class PlaybackController: ObservableObject {
 
     func prepareQueue(_ items: [MediaItem], startingAt itemID: UUID) {
         guard playbackQueue.isEmpty else { return }
-        originalQueue = items
-        playbackQueue = items
+        guard let selectedItem = items.first(where: { $0.id == itemID }) else { return }
+        originalQueue = items.filter { $0.kind.rawValue == selectedItem.kind.rawValue }
+        playbackQueue = originalQueue
         guard let startingIndex = playbackQueue.firstIndex(where: { $0.id == itemID }) else { return }
         currentIndex = startingIndex
         loadCurrentItem(autoplay: false)
