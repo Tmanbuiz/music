@@ -22,3 +22,32 @@ workflows:
     artifacts:
       - build/ios/ipa/*.ipa
       - /tmp/xcodebuild_logs/*.log
+
+  ios-testflight:
+    name: TmanVibez TestFlight
+    max_build_duration: 120
+    instance_type: mac_mini_m2
+    integrations:
+      app_store_connect: codemagic
+    environment:
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.wiantribe.tmanvibez
+      vars:
+        XCODE_PROJECT: TmanVibez.xcodeproj
+        XCODE_SCHEME: TmanVibez
+      xcode: latest
+    scripts:
+      - name: Apply iOS signing profiles
+        script: xcode-project use-profiles
+      - name: Build signed iPhone IPA
+        script: |
+          xcode-project build-ipa --project "$CM_BUILD_DIR/$XCODE_PROJECT" --scheme "$XCODE_SCHEME"
+    artifacts:
+      - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+    publishing:
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: true
+        submit_to_app_store: false
