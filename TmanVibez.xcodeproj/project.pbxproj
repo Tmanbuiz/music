@@ -1,0 +1,218 @@
+// !$*UTF8*$!
+{
+  archiveVersion = 1;
+  classes = {};
+  objectVersion = 56;
+  objects = {
+
+/* Begin PBXBuildFile section */
+    B00000000000000000000001 /* TmanVibezApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00000000000000000000001 /* TmanVibezApp.swift */; };
+    B00000000000000000000002 /* MediaModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00000000000000000000002 /* MediaModels.swift */; };
+    B00000000000000000000003 /* MediaLibrary.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00000000000000000000003 /* MediaLibrary.swift */; };
+    B00000000000000000000004 /* MediaDownloader.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00000000000000000000004 /* MediaDownloader.swift */; };
+    B00000000000000000000005 /* LyricsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00000000000000000000005 /* LyricsService.swift */; };
+    B00000000000000000000006 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00000000000000000000006 /* RootView.swift */; };
+    B00000000000000000000007 /* LibraryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00000000000000000000007 /* LibraryView.swift */; };
+    B00000000000000000000008 /* AddMediaView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00000000000000000000008 /* AddMediaView.swift */; };
+    B00000000000000000000009 /* PlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00000000000000000000009 /* PlayerView.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+    C00000000000000000000001 /* TmanVibezApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TmanVibezApp.swift; sourceTree = "<group>"; };
+    C00000000000000000000002 /* MediaModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaModels.swift; sourceTree = "<group>"; };
+    C00000000000000000000003 /* MediaLibrary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaLibrary.swift; sourceTree = "<group>"; };
+    C00000000000000000000004 /* MediaDownloader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaDownloader.swift; sourceTree = "<group>"; };
+    C00000000000000000000005 /* LyricsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LyricsService.swift; sourceTree = "<group>"; };
+    C00000000000000000000006 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
+    C00000000000000000000007 /* LibraryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryView.swift; sourceTree = "<group>"; };
+    C00000000000000000000008 /* AddMediaView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddMediaView.swift; sourceTree = "<group>"; };
+    C00000000000000000000009 /* PlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerView.swift; sourceTree = "<group>"; };
+    C00000000000000000000010 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+    C00000000000000000000011 /* TmanVibez.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TmanVibez.app; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+    D00000000000000000000001 /* Frameworks */ = {isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+    E00000000000000000000001 = {
+      isa = PBXGroup;
+      children = (
+        E00000000000000000000002 /* TmanVibez */,
+        E00000000000000000000003 /* Products */,
+      );
+      sourceTree = "<group>";
+    };
+    E00000000000000000000002 /* TmanVibez */ = {
+      isa = PBXGroup;
+      path = TmanVibez;
+      sourceTree = "<group>";
+      children = (
+        C00000000000000000000001 /* TmanVibezApp.swift */,
+        C00000000000000000000002 /* MediaModels.swift */,
+        C00000000000000000000003 /* MediaLibrary.swift */,
+        C00000000000000000000004 /* MediaDownloader.swift */,
+        C00000000000000000000005 /* LyricsService.swift */,
+        C00000000000000000000006 /* RootView.swift */,
+        C00000000000000000000007 /* LibraryView.swift */,
+        C00000000000000000000008 /* AddMediaView.swift */,
+        C00000000000000000000009 /* PlayerView.swift */,
+        C00000000000000000000010 /* Info.plist */,
+      );
+    };
+    E00000000000000000000003 /* Products */ = {
+      isa = PBXGroup;
+      children = (
+        C00000000000000000000011 /* TmanVibez.app */,
+      );
+      name = Products;
+      sourceTree = "<group>";
+    };
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+    F00000000000000000000001 /* TmanVibez */ = {
+      isa = PBXNativeTarget;
+      buildConfigurationList = F00000000000000000000002 /* Build configuration list for PBXNativeTarget "TmanVibez" */;
+      buildPhases = (
+        B10000000000000000000001 /* Sources */,
+        D00000000000000000000001 /* Frameworks */,
+        B20000000000000000000001 /* Resources */,
+      );
+      buildRules = ();
+      dependencies = ();
+      name = TmanVibez;
+      productName = TmanVibez;
+      productReference = C00000000000000000000011 /* TmanVibez.app */;
+      productType = "com.apple.product-type.application";
+    };
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+    A00000000000000000000001 /* Project object */ = {
+      isa = PBXProject;
+      attributes = {
+        BuildIndependentTargetsInParallel = 1;
+        LastUpgradeCheck = 1600;
+        LastSwiftUpdateCheck = 1600;
+        TargetAttributes = { F00000000000000000000001 = {CreatedOnToolsVersion = 16.0; }; };
+      };
+      buildConfigurationList = A00000000000000000000002 /* Build configuration list for PBXProject "TmanVibez" */;
+      compatibilityVersion = "Xcode 14.0";
+      developmentRegion = en;
+      hasScannedForEncodings = 0;
+      knownRegions = (en, Base);
+      mainGroup = E00000000000000000000001;
+      productRefGroup = E00000000000000000000003 /* Products */;
+      projectDirPath = "";
+      projectRoot = "";
+      targets = (F00000000000000000000001 /* TmanVibez */,);
+    };
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+    B20000000000000000000001 /* Resources */ = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+    B10000000000000000000001 /* Sources */ = {
+      isa = PBXSourcesBuildPhase;
+      buildActionMask = 2147483647;
+      files = (
+        B00000000000000000000001 /* TmanVibezApp.swift in Sources */,
+        B00000000000000000000002 /* MediaModels.swift in Sources */,
+        B00000000000000000000003 /* MediaLibrary.swift in Sources */,
+        B00000000000000000000004 /* MediaDownloader.swift in Sources */,
+        B00000000000000000000005 /* LyricsService.swift in Sources */,
+        B00000000000000000000006 /* RootView.swift in Sources */,
+        B00000000000000000000007 /* LibraryView.swift in Sources */,
+        B00000000000000000000008 /* AddMediaView.swift in Sources */,
+        B00000000000000000000009 /* PlayerView.swift in Sources */,
+      );
+      runOnlyForDeploymentPostprocessing = 0;
+    };
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+    A10000000000000000000001 /* Debug project */ = {
+      isa = XCBuildConfiguration;
+      buildSettings = {
+        ALWAYS_SEARCH_USER_PATHS = NO;
+        CLANG_ENABLE_MODULES = YES;
+        IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+        SDKROOT = iphoneos;
+        SWIFT_VERSION = 5.0;
+      };
+      name = Debug;
+    };
+    A10000000000000000000002 /* Release project */ = {
+      isa = XCBuildConfiguration;
+      buildSettings = {
+        ALWAYS_SEARCH_USER_PATHS = NO;
+        CLANG_ENABLE_MODULES = YES;
+        IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+        SDKROOT = iphoneos;
+        SWIFT_VERSION = 5.0;
+      };
+      name = Release;
+    };
+    A10000000000000000000003 /* Debug target */ = {
+      isa = XCBuildConfiguration;
+      buildSettings = {
+        CODE_SIGN_STYLE = Automatic;
+        CURRENT_PROJECT_VERSION = 2;
+        GENERATE_INFOPLIST_FILE = NO;
+        INFOPLIST_FILE = TmanVibez/Info.plist;
+        IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+        MARKETING_VERSION = 1.0.1;
+        PRODUCT_BUNDLE_IDENTIFIER = com.wiantribe.tmanvibez;
+        PRODUCT_NAME = "$(TARGET_NAME)";
+        SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+        SWIFT_VERSION = 5.0;
+        TARGETED_DEVICE_FAMILY = 1;
+      };
+      name = Debug;
+    };
+    A10000000000000000000004 /* Release target */ = {
+      isa = XCBuildConfiguration;
+      buildSettings = {
+        CODE_SIGN_STYLE = Automatic;
+        CURRENT_PROJECT_VERSION = 2;
+        GENERATE_INFOPLIST_FILE = NO;
+        INFOPLIST_FILE = TmanVibez/Info.plist;
+        IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+        MARKETING_VERSION = 1.0.1;
+        PRODUCT_BUNDLE_IDENTIFIER = com.wiantribe.tmanvibez;
+        PRODUCT_NAME = "$(TARGET_NAME)";
+        SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+        SWIFT_VERSION = 5.0;
+        TARGETED_DEVICE_FAMILY = 1;
+      };
+      name = Release;
+    };
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+    A00000000000000000000002 /* Build configuration list for PBXProject "TmanVibez" */ = {
+      isa = XCConfigurationList;
+      buildConfigurations = (
+        A10000000000000000000001 /* Debug project */,
+        A10000000000000000000002 /* Release project */,
+      );
+      defaultConfigurationIsVisible = 0;
+      defaultConfigurationName = Release;
+    };
+    F00000000000000000000002 /* Build configuration list for PBXNativeTarget "TmanVibez" */ = {
+      isa = XCConfigurationList;
+      buildConfigurations = (
+        A10000000000000000000003 /* Debug target */,
+        A10000000000000000000004 /* Release target */,
+      );
+      defaultConfigurationIsVisible = 0;
+      defaultConfigurationName = Release;
+    };
+/* End XCConfigurationList section */
+  };
+  rootObject = A00000000000000000000001 /* Project object */;
+}
