@@ -117,7 +117,12 @@ struct AddMediaView: View {
             allowsMultipleSelection: false
         ) { result in
             switch result {
-            case .success(let folderURL):
+            case .success(let folderURLs):
+                guard let folderURL = folderURLs.first else {
+                    notice = "No folder was selected."
+                    showNotice = true
+                    return
+                }
                 isSyncingFolder = true
                 Task {
                     do {
