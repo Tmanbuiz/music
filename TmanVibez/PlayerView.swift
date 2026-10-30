@@ -120,7 +120,7 @@ struct PlayerView: View {
                 } label: {
                     Image(systemName: "shuffle")
                         .font(.system(size: 18, weight: .semibold))
-                        .foregroundStyle(playback.isShuffleEnabled ? .cyan : .secondary)
+                        .foregroundStyle(playback.isShuffleEnabled ? Color.cyan : Color.secondary)
                 }
                 .accessibilityLabel(playback.isShuffleEnabled ? "Turn shuffle off" : "Turn shuffle on")
 
@@ -161,7 +161,7 @@ struct PlayerView: View {
                 } label: {
                     Image(systemName: playback.repeatMode.systemImage)
                         .font(.system(size: 18, weight: .semibold))
-                        .foregroundStyle(playback.repeatMode == .off ? .secondary : .cyan)
+                        .foregroundStyle(playback.repeatMode == .off ? Color.secondary : Color.cyan)
                 }
                 .accessibilityLabel(playback.repeatMode.accessibilityLabel)
             }
@@ -251,19 +251,10 @@ final class PlaybackController: ObservableObject {
             forInterval: CMTime(seconds: 0.35, preferredTimescale: 600),
             queue: .main
         ) { [weak self] time in
-            guard let self else { return }
             let value = time.seconds
-            self.currentTime = value.isFinite ? value : 0
-
-            if let currentItem = self.player.currentItem {
-                let total = currentItem.duration.seconds
-                if total.isFinite, total > 0 {
-                    let durationChanged = self.duration != total
-                    self.duration = total
-                    if durationChanged { self.updateNowPlayingInfo() }
-                }
+            Task { @MainActor [weak self] in
+                self?.updatePlaybackState(at: value)
             }
-            self.isPlaying = self.player.timeControlStatus == .playing
         }
 
         completionObserver = NotificationCenter.default.addObserver(
@@ -470,6 +461,20 @@ final class PlaybackController: ObservableObject {
             info[MPMediaItemPropertyPlaybackDuration] = duration
         }
         MPNowPlayingInfoCenter.default().nowPlayingInfo = info
+    }
+
+    private func updatePlaybackState(at value: Double) {
+        currentTime = value.isFinite ? value : 0
+
+        if let currentItem = player.currentItem {
+            let total = currentItem.duration.seconds
+            if total.isFinite, total > 0 {
+                let durationChanged = duration != total
+                duration = total
+                if durationChanged { updateNowPlayingInfo() }
+            }
+        }
+        isPlaying = player.timeControlStatus == .playing
     }
 }
 
