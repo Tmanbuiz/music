@@ -84,7 +84,7 @@ struct AddMediaView: View {
                 VStack(alignment: .leading, spacing: 8) {
                     Label("Direct downloads only", systemImage: "checkmark.shield")
                         .font(.headline)
-                    Text("TmanVibez does not extract streams from websites or bypass DRM, paywalls, or download restrictions. Use a direct file link and save only media you have permission to keep.")
+                    Text("YouTube links cannot be downloaded from TmanVibez. Use YouTube's official offline feature when available. For other sources, use a direct media-file link only when you have permission to keep it; the app does not extract streams, bypass DRM, paywalls, or download restrictions.")
                         .font(.footnote)
                         .foregroundStyle(.secondary)
                 }

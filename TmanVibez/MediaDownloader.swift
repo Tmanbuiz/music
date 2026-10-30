@@ -15,6 +15,12 @@ enum MediaDownloader {
             throw DownloadError.httpsRequired
         }
 
+        let host = url.host?.lowercased() ?? ""
+        let videoServiceHosts = ["youtube.com", "youtu.be"]
+        if videoServiceHosts.contains(where: { host == $0 || host.hasSuffix(".\($0)") }) {
+            throw DownloadError.youtubeDownloadsUnsupported
+        }
+
         let blockedExtensions: Set<String> = ["html", "htm", "m3u8", "mpd"]
         guard !blockedExtensions.contains(url.pathExtension.lowercased()) else {
             throw DownloadError.directFileOnly
@@ -58,6 +64,7 @@ enum MediaDownloader {
 
 enum DownloadError: LocalizedError, Sendable {
     case httpsRequired
+    case youtubeDownloadsUnsupported
     case directFileOnly
     case notMediaFile
     case serverRejected
@@ -66,6 +73,8 @@ enum DownloadError: LocalizedError, Sendable {
         switch self {
         case .httpsRequired:
             return "Use a secure HTTPS link."
+        case .youtubeDownloadsUnsupported:
+            return "YouTube links cannot be downloaded here. Use YouTube's official offline feature when available, or add a media file you have permission to save."
         case .directFileOnly:
             return "This looks like a webpage or stream playlist. Paste a direct link to a supported audio or video file."
         case .notMediaFile:

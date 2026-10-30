@@ -2,6 +2,7 @@ import SwiftUI
 import AVKit
 import AVFoundation
 import Combine
+import MediaPlayer
 
 struct PlayerView: View {
     let itemID: UUID
@@ -13,11 +14,12 @@ struct PlayerView: View {
 
     init(item: MediaItem) {
         itemID = item.id
-        _playback = StateObject(wrappedValue: PlaybackController(url: item.localURL))
+        _playback = StateObject(wrappedValue: PlaybackController(item: item))
     }
 
     private var item: MediaItem? {
-        library.items.first(where: { $0.id == itemID })
+        library.items.first(where: { $0.id == playback.currentItemID })
+            ?? library.items.first(where: { $0.id == itemID })
     }
 
     var body: some View {
@@ -63,7 +65,10 @@ struct PlayerView: View {
                 }
             }
         }
-        .onAppear { playback.play() }
+        .onAppear {
+            playback.prepareQueue(library.items, startingAt: itemID)
+            playback.play()
+        }
         .onDisappear { playback.pause() }
         .sheet(isPresented: $showLyricsSearch) {
             if let item {
@@ -109,13 +114,26 @@ struct PlayerView: View {
                 .foregroundStyle(.secondary)
             }
 
-            HStack(spacing: 36) {
+            HStack {
                 Button {
-                    playback.skip(by: -15)
+                    playback.toggleShuffle()
                 } label: {
-                    Image(systemName: "gobackward.15")
-                        .font(.system(size: 25))
+                    Image(systemName: "shuffle")
+                        .font(.system(size: 18, weight: .semibold))
+                        .foregroundStyle(playback.isShuffleEnabled ? .cyan : .secondary)
                 }
+                .accessibilityLabel(playback.isShuffleEnabled ? "Turn shuffle off" : "Turn shuffle on")
+
+                Spacer()
+
+                Button {
+                    playback.previousTrack()
+                } label: {
+                    Image(systemName: "backward.end.fill")
+                        .font(.system(size: 22))
+                }
+                .disabled(!playback.canSkipPrevious)
+                .accessibilityLabel("Previous track")
 
                 Button {
                     playback.togglePlayback()
@@ -128,11 +146,24 @@ struct PlayerView: View {
                 }
 
                 Button {
-                    playback.skip(by: 15)
+                    playback.nextTrack()
                 } label: {
-                    Image(systemName: "goforward.15")
-                        .font(.system(size: 25))
+                    Image(systemName: "forward.end.fill")
+                        .font(.system(size: 22))
                 }
+                .disabled(!playback.canSkipNext)
+                .accessibilityLabel("Next track")
+
+                Spacer()
+
+                Button {
+                    playback.cycleRepeatMode()
+                } label: {
+                    Image(systemName: playback.repeatMode.systemImage)
+                        .font(.system(size: 18, weight: .semibold))
+                        .foregroundStyle(playback.repeatMode == .off ? .secondary : .cyan)
+                }
+                .accessibilityLabel(playback.repeatMode.accessibilityLabel)
             }
             .buttonStyle(.plain)
         }
@@ -189,14 +220,31 @@ struct PlayerView: View {
 final class PlaybackController: ObservableObject {
     let player: AVPlayer
 
+    @Published private(set) var currentItemID: UUID
     @Published private(set) var currentTime: Double = 0
     @Published private(set) var duration: Double = 0
     @Published private(set) var isPlaying = false
+    @Published private(set) var isShuffleEnabled = false
+    @Published private(set) var repeatMode: RepeatMode = .off
 
     private var timeObserver: Any?
+    private var completionObserver: NSObjectProtocol?
+    private var remoteCommandTargets: [(MPRemoteCommand, Any)] = []
+    private var originalQueue: [MediaItem] = []
+    private var playbackQueue: [MediaItem] = []
+    private var currentIndex = 0
 
-    init(url: URL) {
-        player = AVPlayer(url: url)
+    var canSkipPrevious: Bool {
+        currentTime > 3 || currentIndex > 0 || repeatMode == .all
+    }
+
+    var canSkipNext: Bool {
+        currentIndex + 1 < playbackQueue.count || repeatMode == .all
+    }
+
+    init(item: MediaItem) {
+        currentItemID = item.id
+        player = AVPlayer(url: item.localURL)
         try? AVAudioSession.sharedInstance().setCategory(.playback, mode: .default)
 
         timeObserver = player.addPeriodicTimeObserver(
@@ -210,27 +258,62 @@ final class PlaybackController: ObservableObject {
             if let currentItem = self.player.currentItem {
                 let total = currentItem.duration.seconds
                 if total.isFinite, total > 0 {
+                    let durationChanged = self.duration != total
                     self.duration = total
+                    if durationChanged { self.updateNowPlayingInfo() }
                 }
             }
             self.isPlaying = self.player.timeControlStatus == .playing
         }
+
+        completionObserver = NotificationCenter.default.addObserver(
+            forName: .AVPlayerItemDidPlayToEndTime,
+            object: nil,
+            queue: .main
+        ) { [weak self] notification in
+            guard let finishedItem = notification.object as? AVPlayerItem else { return }
+            Task { @MainActor [weak self] in
+                self?.handlePlaybackEnded(finishedItem)
+            }
+        }
+
+        configureRemoteCommands()
+        updateNowPlayingInfo()
     }
 
     deinit {
         if let timeObserver {
             player.removeTimeObserver(timeObserver)
         }
+        if let completionObserver {
+            NotificationCenter.default.removeObserver(completionObserver)
+        }
+        for (command, target) in remoteCommandTargets {
+            command.removeTarget(target)
+        }
+        MPNowPlayingInfoCenter.default().nowPlayingInfo = nil
+    }
+
+    func prepareQueue(_ items: [MediaItem], startingAt itemID: UUID) {
+        guard playbackQueue.isEmpty else { return }
+        originalQueue = items
+        playbackQueue = items
+        guard let startingIndex = playbackQueue.firstIndex(where: { $0.id == itemID }) else { return }
+        currentIndex = startingIndex
+        loadCurrentItem(autoplay: false)
     }
 
     func play() {
+        try? AVAudioSession.sharedInstance().setActive(true)
         player.play()
         isPlaying = true
+        updateNowPlayingInfo()
     }
 
     func pause() {
         player.pause()
         isPlaying = false
+        updateNowPlayingInfo()
     }
 
     func togglePlayback() {
@@ -241,10 +324,181 @@ final class PlaybackController: ObservableObject {
         let bounded = min(max(seconds, 0), max(duration, 0))
         player.seek(to: CMTime(seconds: bounded, preferredTimescale: 600))
         currentTime = bounded
+        updateNowPlayingInfo()
     }
 
     func skip(by seconds: Double) {
         seek(to: currentTime + seconds)
+    }
+
+    func toggleShuffle() {
+        guard let currentItem = currentTrack else { return }
+        isShuffleEnabled.toggle()
+
+        if isShuffleEnabled {
+            playbackQueue = [currentItem] + originalQueue
+                .filter { $0.id != currentItem.id }
+                .shuffled()
+            currentIndex = 0
+        } else {
+            playbackQueue = originalQueue
+            currentIndex = playbackQueue.firstIndex(where: { $0.id == currentItem.id }) ?? 0
+        }
+    }
+
+    func cycleRepeatMode() {
+        repeatMode = repeatMode.next
+        updateNowPlayingInfo()
+    }
+
+    func previousTrack() {
+        if currentTime > 3 {
+            seek(to: 0)
+            return
+        }
+
+        if currentIndex > 0 {
+            currentIndex -= 1
+        } else if repeatMode == .all, !playbackQueue.isEmpty {
+            currentIndex = playbackQueue.count - 1
+        } else {
+            return
+        }
+        loadCurrentItem(autoplay: true)
+    }
+
+    func nextTrack() {
+        guard !playbackQueue.isEmpty else { return }
+        if currentIndex + 1 < playbackQueue.count {
+            currentIndex += 1
+        } else if repeatMode == .all {
+            currentIndex = 0
+        } else {
+            return
+        }
+        loadCurrentItem(autoplay: true)
+    }
+
+    private var currentTrack: MediaItem? {
+        guard playbackQueue.indices.contains(currentIndex) else { return nil }
+        return playbackQueue[currentIndex]
+    }
+
+    private func loadCurrentItem(autoplay: Bool) {
+        guard let item = currentTrack else { return }
+        currentItemID = item.id
+        currentTime = 0
+        duration = 0
+        isPlaying = false
+        player.replaceCurrentItem(with: AVPlayerItem(url: item.localURL))
+        updateNowPlayingInfo()
+        if autoplay { play() }
+    }
+
+    private func handlePlaybackEnded(_ finishedItem: AVPlayerItem) {
+        guard finishedItem === player.currentItem else { return }
+
+        if repeatMode == .one {
+            player.seek(to: .zero) { [weak self] completed in
+                guard completed else { return }
+                Task { @MainActor [weak self] in self?.play() }
+            }
+        } else if canSkipNext {
+            nextTrack()
+        } else {
+            isPlaying = false
+            currentTime = duration
+            updateNowPlayingInfo()
+        }
+    }
+
+    private func configureRemoteCommands() {
+        let center = MPRemoteCommandCenter.shared()
+        register(center.playCommand) { [weak self] _ in
+            guard self != nil else { return .commandFailed }
+            Task { @MainActor [weak self] in self?.play() }
+            return .success
+        }
+        register(center.pauseCommand) { [weak self] _ in
+            guard self != nil else { return .commandFailed }
+            Task { @MainActor [weak self] in self?.pause() }
+            return .success
+        }
+        register(center.togglePlayPauseCommand) { [weak self] _ in
+            guard self != nil else { return .commandFailed }
+            Task { @MainActor [weak self] in self?.togglePlayback() }
+            return .success
+        }
+        register(center.nextTrackCommand) { [weak self] _ in
+            guard let self, self.canSkipNext else { return .noSuchContent }
+            Task { @MainActor [weak self] in self?.nextTrack() }
+            return .success
+        }
+        register(center.previousTrackCommand) { [weak self] _ in
+            guard let self, self.canSkipPrevious else { return .noSuchContent }
+            Task { @MainActor [weak self] in self?.previousTrack() }
+            return .success
+        }
+        register(center.changePlaybackPositionCommand) { [weak self] event in
+            guard let self,
+                  let positionEvent = event as? MPChangePlaybackPositionCommandEvent else {
+                return .commandFailed
+            }
+            Task { @MainActor [weak self] in self?.seek(to: positionEvent.positionTime) }
+            return .success
+        }
+    }
+
+    private func register(
+        _ command: MPRemoteCommand,
+        handler: @escaping (MPRemoteCommandEvent) -> MPRemoteCommandHandlerStatus
+    ) {
+        command.isEnabled = true
+        let target = command.addTarget(handler: handler)
+        remoteCommandTargets.append((command, target))
+    }
+
+    private func updateNowPlayingInfo() {
+        guard let item = currentTrack ?? originalQueue.first(where: { $0.id == currentItemID }) else { return }
+        var info: [String: Any] = [
+            MPMediaItemPropertyTitle: item.title,
+            MPMediaItemPropertyArtist: item.artist,
+            MPNowPlayingInfoPropertyElapsedPlaybackTime: currentTime,
+            MPNowPlayingInfoPropertyPlaybackRate: isPlaying ? 1.0 : 0.0
+        ]
+        if duration > 0 {
+            info[MPMediaItemPropertyPlaybackDuration] = duration
+        }
+        MPNowPlayingInfoCenter.default().nowPlayingInfo = info
+    }
+}
+
+enum RepeatMode: Equatable {
+    case off
+    case all
+    case one
+
+    var next: RepeatMode {
+        switch self {
+        case .off: .all
+        case .all: .one
+        case .one: .off
+        }
+    }
+
+    var systemImage: String {
+        switch self {
+        case .off, .all: "repeat"
+        case .one: "repeat.1"
+        }
+    }
+
+    var accessibilityLabel: String {
+        switch self {
+        case .off: "Repeat off"
+        case .all: "Repeat all tracks"
+        case .one: "Repeat this track"
+        }
     }
 }
 

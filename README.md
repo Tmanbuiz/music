@@ -9,7 +9,7 @@ TmanVibez is a local-first SwiftUI iPhone app starter for managing an offline au
 - Re-select the folder later to add new tracks and refresh changed tracks
 - Search the whole library for missing synced or plain lyrics
 - Cache selected lyrics with the local track for offline viewing
-- Play imported and downloaded media from the app
+- Play imported and downloaded media with shuffle, repeat one/all, next/previous track, background audio, and lock-screen controls
 - Download a direct HTTPS audio/video file when its source permits downloads
 
 ## iPhone access and format limits
@@ -20,7 +20,7 @@ The first version targets common formats supported by Apple's media frameworks: 
 
 ## Direct download limits
 
-Downloads are limited to direct HTTPS links that return a supported single media file. The app does not extract media from streaming pages, bypass DRM, defeat paywalls, or download protected streams. Use only files you own or are authorized to save. Apple Music and Spotify subscription downloads stay in their respective apps.
+Downloads are limited to direct HTTPS links that return a supported single media file. YouTube links are rejected; the app does not download or extract YouTube audio or video. Use YouTube's official offline feature when available. Other files must be ones you own or are authorized to save. The app does not bypass DRM, paywalls, or download restrictions. Apple Music and Spotify subscription downloads stay in their respective apps.
 
 ## Lyrics
 
@@ -42,7 +42,7 @@ The repository includes two Codemagic workflows. Both use the App Store Connect 
 - `ios-adhoc` creates an Ad Hoc IPA for registered iPhones.
 - `ios-testflight` signs with App Store distribution and uploads the build to TestFlight. It does not submit the app for public App Store release.
 
-For the first TestFlight upload, create the TmanVibez app record in App Store Connect using bundle ID `com.wiantribe.tmanvibez`. Codemagic also needs an App Store provisioning profile for that bundle ID. The current project version is 1.0.1 (build 2); increase the build number for each later upload.
+For the first TestFlight upload, create the TmanVibez app record in App Store Connect using bundle ID `com.wiantribe.tmanvibez`. Codemagic also needs an App Store provisioning profile for that bundle ID. The current project version is 1.0.2 (build 3); increase the build number for each later upload.
 
 Apple signing requires an Apple Developer Program membership. Keep the API key and its private file inside Codemagic; do not put them in this repository. Ad Hoc IPAs must be installed using a supported iOS distribution method; they cannot be installed by tapping them in Files.
 
@@ -52,4 +52,4 @@ An exact-name search for `TmanVibez` on October 30, 2026 found no matching app o
 
 ## Version
 
-1.0.1 (build 2)
+1.0.2 (build 3)
