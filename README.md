@@ -35,11 +35,16 @@ Bulk lyric lookup uses LRCLIB's public search API. Requests are sent one at a ti
 
 This workspace contains source only. It does not include an iOS build environment, signed IPA, or TestFlight upload.
 
-## Build and sideload with Codemagic
+## Build, sideload, and test with Codemagic
 
-The repository includes a `codemagic.yaml` workflow named `ios-adhoc`. It references an App Store Connect API key named `codemagic` in Codemagic. If your Codemagic account uses a different key name, change `integrations.app_store_connect` in the YAML to match it. Register the iPhone's device ID with Apple and use an Ad Hoc provisioning profile for `com.wiantribe.tmanvibez`. Then run the workflow; Codemagic will provide the signed `.ipa` as a build artifact.
+The repository includes two Codemagic workflows. Both use the App Store Connect API key integration named `codemagic`.
 
-Apple signing requires an Apple Developer Program membership. Keep the API key and its private file inside Codemagic; do not put them in this repository. The `.ipa` must be installed using a supported iOS distribution method; it cannot be installed by tapping it in Files.
+- `ios-adhoc` creates an Ad Hoc IPA for registered iPhones.
+- `ios-testflight` signs with App Store distribution and uploads the build to TestFlight. It does not submit the app for public App Store release.
+
+For the first TestFlight upload, create the TmanVibez app record in App Store Connect using bundle ID `com.wiantribe.tmanvibez`. Codemagic also needs an App Store provisioning profile for that bundle ID. The current project version is 1.0.1 (build 2); increase the build number for each later upload.
+
+Apple signing requires an Apple Developer Program membership. Keep the API key and its private file inside Codemagic; do not put them in this repository. Ad Hoc IPAs must be installed using a supported iOS distribution method; they cannot be installed by tapping them in Files.
 
 ## Name and domain check
 
