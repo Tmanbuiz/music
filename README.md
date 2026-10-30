@@ -37,9 +37,9 @@ This workspace contains source only. It does not include an iOS build environmen
 
 ## Build and sideload with Codemagic
 
-The repository includes a `codemagic.yaml` workflow named `ios-adhoc`. Connect this repository to Codemagic, configure an Ad Hoc signing certificate and provisioning profile for `com.wiantribe.tmanvibez`, then run that workflow. The profile must include the iPhone's registered device ID. Codemagic will provide the signed `.ipa` as a build artifact.
+The repository includes a `codemagic.yaml` workflow named `ios-adhoc`. Connect this repository to Codemagic and add an App Store Connect API key with the integration name `TmanVibezSigning`. Register the iPhone's device ID with Apple and use an Ad Hoc provisioning profile for `com.wiantribe.tmanvibez`. Then run the workflow; Codemagic will provide the signed `.ipa` as a build artifact.
 
-Apple signing requires an Apple Developer Program membership. You can let Codemagic manage signing through an App Store Connect API key, or upload matching signing files in Codemagic. The `.ipa` must be installed using a supported iOS distribution method; it cannot be installed by tapping it in Files.
+Apple signing requires an Apple Developer Program membership. Keep the API key and its private file inside Codemagic; do not put them in this repository. The `.ipa` must be installed using a supported iOS distribution method; it cannot be installed by tapping it in Files.
 
 ## Name and domain check
 
